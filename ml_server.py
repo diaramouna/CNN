@@ -182,8 +182,12 @@ class CNNModelManager:
                 import tensorflow as tf
                 logger.info(f"📦 TensorFlow version: {tf.__version__}")
                 
-                # Charger le modèle
-                self.model = tf.keras.models.load_model(str(model_file))
+                # Charger le modèle avec gestion des incompatibilités de version
+                import warnings
+                with warnings.catch_warnings():
+                    warnings.filterwarnings("ignore", category=UserWarning)
+                    # compile=False évite les erreurs de désérialisation entre versions Keras
+                    self.model = tf.keras.models.load_model(str(model_file), compile=False)
                 
                 self.load_time = time.time() - start_time
                 self.is_loaded = True
@@ -384,11 +388,11 @@ async def predict_image(file: UploadFile = File(...)):
         )
         
     except Exception as e:
-            import traceback
-            error_detail = traceback.format_exc()
-            logger.error(f"❌ Erreur endpoint predict: {e}")
-            logger.error(f"❌ Traceback:\n{error_detail}")
-            raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        error_detail = traceback.format_exc()
+        logger.error(f"❌ Erreur endpoint predict: {e}")
+        logger.error(f"❌ Traceback:\n{error_detail}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/predict_base64", response_model=PredictionResponse)
 async def predict_base64(request: Base64PredictRequest):
@@ -458,7 +462,4 @@ if __name__ == "__main__":
         port=args.port,
         reload=args.reload,
         log_level="info"
-    ) 
-    reload=args.reload,
-    log_level="info"
-    
+    )
