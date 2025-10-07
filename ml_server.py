@@ -165,8 +165,13 @@ class CNNModelManager:
             
             # Vérifier si le fichier existe
             model_file = Path(MODEL_PATH)
+            logger.info(f"🔍 Recherche du modèle: {MODEL_PATH}")
+            logger.info(f"🔍 Chemin absolu: {model_file.absolute()}")
+            logger.info(f"🔍 Fichier existe? {model_file.exists()}")
+            
             if not model_file.exists():
                 logger.error(f"❌ Modèle non trouvé: {MODEL_PATH}")
+                logger.error(f"❌ Chemin absolu testé: {model_file.absolute()}")
                 return False
             
             # Calculer la taille du fichier
@@ -197,6 +202,8 @@ class CNNModelManager:
                 
         except Exception as e:
             logger.error(f"❌ Erreur lors du chargement du modèle: {e}")
+            import traceback
+            logger.error(f"❌ Traceback complet:\n{traceback.format_exc()}")
             return False
     
     def preprocess_image(self, image: Image.Image) -> np.ndarray:
@@ -377,8 +384,11 @@ async def predict_image(file: UploadFile = File(...)):
         )
         
     except Exception as e:
-        logger.error(f"❌ Erreur endpoint predict: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+            import traceback
+            error_detail = traceback.format_exc()
+            logger.error(f"❌ Erreur endpoint predict: {e}")
+            logger.error(f"❌ Traceback:\n{error_detail}")
+            raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/predict_base64", response_model=PredictionResponse)
 async def predict_base64(request: Base64PredictRequest):
@@ -449,3 +459,6 @@ if __name__ == "__main__":
         reload=args.reload,
         log_level="info"
     ) 
+    reload=args.reload,
+    log_level="info"
+    
