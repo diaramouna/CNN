@@ -5,7 +5,8 @@ python-multipart==0.0.9
 pillow==10.4.0
 numpy==1.24.3
 pydantic==2.9.2
-# TensorFlow version stable avec Python 3.11 (Render Free)
-tensorflow==2.13.0
+# TensorFlow 2.13 stable avec Python 3.11
+tensorflow-cpu==2.13.0
 # TF 2.13 requiert protobuf < 4
 protobuf>=3.20.3,<4
+
